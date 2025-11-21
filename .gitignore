@@ -1,0 +1,36 @@
+# --- 1. GLOBAL & IDE (File rác hệ thống và cấu hình Editor) ---
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+*.iml
+*.log
+
+# --- 2. BACKEND (Java Spring Boot) ---
+# Thư mục chứa file biên dịch (class, jar) - Không up lên
+backend/target/
+backend/*.jar
+
+# Thư mục chứa dữ liệu chạy thực tế (Vector Store & File Text) - Không up lên
+# backend/data/
+
+# File cấu hình chứa Key nhạy cảm (Nếu bạn muốn bảo mật tuyệt đối thì bỏ comment dòng dưới)
+# backend/src/main/resources/application.properties
+
+# --- 3. FRONTEND (React Vite) ---
+# Thư viện tải về (Rất nặng, không up lên)
+frontend/node_modules/
+
+# Thư mục build ra web tĩnh
+frontend/dist/
+frontend/build/
+
+# File biến môi trường (Chứa API Key)
+frontend/.env
+frontend/.env.local
+frontend/.env.*.local
+
+# Log lỗi của npm
+frontend/npm-debug.log*
+frontend/yarn-debug.log*
+frontend/yarn-error.log*

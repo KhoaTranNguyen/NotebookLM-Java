@@ -1,0 +1,113 @@
+ 
+Call for Papers 
+ 
+Steering Committee 
+Seong-Whan Lee, South Korea 
+Cheng-Lin Liu, China 
+Umapada Pal, India 
+Tieniu Tan, China 
+Yasushi Yagi, Japan 
+ 
+General Chairs 
+Alan Wee-Chung Liew, Australia 
+Cheng-Lin Liu, China 
+Dacheng Tao, Singapore 
+ 
+Program Chairs 
+Brian Lovell, Australia 
+Ran He, China 
+Christian, South Korea 
+ 
+Organizing Chairs  
+Alireza Alaei, Australia 
+Anwaar Ul-Haq, Australia 
+Partha Pratim Roy, India 
+Yanming Zhu, Australia 
+ 
+Publicity Chairs 
+Umapada Pal, India 
+Yuta Nakashima, Japan 
+Unsang Park, South Korea 
+Shijian Lu, Singapore 
+Brendan Mccane, New Zealand 
+ 
+Workshop Co-Chairs 
+Xiao Bai , China 
+Lihong Zheng, Australia 
+Xiaoyi Jiang, Germany 
+Reza Ghanbarzadeh, Australia 
+ 
+Tutorial Chairs  
+Vinh Bui, Australia 
+Venu Govindaraju, USA 
+Mohammed Awrangeb, Australia 
+Can Wang, Australia 
+ 
+Sponsorship Chairs 
+Michael Blumenstien, Sydney 
+ 
+Awards Committee Chair 
+Jun Zhou, Australia 
+ 
+Publications Chairs 
+Haifeng Shen, Australia 
+Fahimeh Alaei, Australia 
+Prithwi Chakraborty, Australia 
+ 
+Finance Chairs   
+ 
+Tony Adriaansen, Australia 
+ 
+ 
+The 8th Asian Conference on Pattern Recognition (ACPR 2025) will be hosted 
+on the stunning Gold Coast of Australia, from November 10 to 13, 2025. The 
+Gold Coast is a vibrant and diverse city, offering a wealth of opportunities for 
+academic and professional development. With over 150 events and 
+conferences already scheduled, it serves as a dynamic hub for global 
+collaboration and innovation. The Asian Conference on Pattern Recognition 
+(ACPR) is supported by the International Association of Pattern Recognition 
+and covering a wide range of research domains, including computer vision, 
+image, speech, sensor pattern processing and machine intelligence. It is a 4-
+day single track event that comprises the main conference, Tutorials, and 
+Workshops. ACPR2025 provides a great opportunity to nurture new ideas and 
+collaborations for students, academics and industry researchers. 
+ 
+Main topics of Interest 
+Topics of interest include the following aspects of pattern recognition, but are 
+not limited to these. 
+ 
+➢ Pattern Recognition and Machine Learning 
+➢ Computer Vision and Robot Vision 
+➢ Signal, Speech and Video Processing 
+➢ Document, Media Processing and Interaction 
+➢ Biomedical Imaging and Bioinformatics 
+ 
+Important Dates 
+➢ First Call for Papers: March 2025 
+➢ Second Call for Papers: April 2025 
+➢ Paper submission open: May 1, 2025 
+➢ Abstract submission deadline: June 3, 2025 
+➢ Full paper submission deadline: June 10, 2025 
+➢ Acceptance notification: August 10, 2025 
+➢ Camera-ready submission: August 31, 2025 
+➢ Conference: November 10-11, 2025 
+ 
+Submission and Review 
+ACPR 2025 will follow a single-blind review process. Authors can include 
+their names and affiliations in the manuscript. Also, the authors can submit 
+their arXiv papers in ACPR-2025. 
+ 
+Paper format and length 
+Springer LNCS format with maximum 15 pages (including references) during 
+paper submission. There is no minimum page limit. To take care of reviewers' 
+comments, one more page is allowed (without any charge) during 
+revised/camera ready submission. Moreover, authors may purchase up to 2 
+extra pages. Extra page charges must be paid at the time of registration. All 
+accepted papers will be published in Springer’s Lecture Notes in Computer 
+Science (LNCS) and indexed by ISI, Scopus, EI, Google Scholar, DBLP, 
+Springer LNCS, etc.  
+ 
+Contact: For any enquiry please contact the ACPR2025 Secretariat via email 
+at  acprau2025@gmail.com 
+ 
+Website: www.acpr2025.com  

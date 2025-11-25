@@ -1,20 +1,25 @@
 package com.khoa.notebooklm.service;
 
-import dev.langchain4j.data.document.Document;
-import dev.langchain4j.data.document.parser.apache.pdfbox.ApachePdfBoxDocumentParser;
-import dev.langchain4j.data.document.splitter.DocumentSplitters;
+import com.khoa.notebooklm.base_class.Document;
+import com.khoa.notebooklm.base_class.PdfDocumentParser;
+
+import com.khoa.notebooklm.base_class.CustomRecursiveSplitter;
+
 import dev.langchain4j.data.embedding.Embedding;
 import dev.langchain4j.data.segment.TextSegment;
+
 import dev.langchain4j.memory.chat.MessageWindowChatMemory;
 import dev.langchain4j.model.chat.ChatLanguageModel;
 import dev.langchain4j.model.embedding.EmbeddingModel;
 import dev.langchain4j.rag.DefaultRetrievalAugmentor;
 import dev.langchain4j.rag.content.retriever.EmbeddingStoreContentRetriever;
 import dev.langchain4j.service.AiServices;
+
 import dev.langchain4j.store.embedding.EmbeddingStore;
 import dev.langchain4j.store.embedding.inmemory.InMemoryEmbeddingStore;
 import dev.langchain4j.store.embedding.filter.Filter;
 import dev.langchain4j.store.embedding.filter.MetadataFilterBuilder;
+
 import org.springframework.stereotype.Service;
 
 import java.io.ByteArrayInputStream;
@@ -37,6 +42,7 @@ public class RAGService {
     
     // Cache RAM cho tốc độ
     private final Map<String, String> documentContentCache = new ConcurrentHashMap<>();
+    private final Map<String, StudyAssistant> assistantCache = new ConcurrentHashMap<>();
     
     // Cấu hình đường dẫn lưu trữ
     private static final String DATA_DIR = "data/";
@@ -80,7 +86,7 @@ public class RAGService {
         try (InputStream inputStream = new ByteArrayInputStream(pdfData)) {
             System.out.println("--- Bắt đầu xử lý file PDF ---");
             
-            ApachePdfBoxDocumentParser parser = new ApachePdfBoxDocumentParser();
+            PdfDocumentParser parser = new PdfDocumentParser();
             Document document = parser.parse(inputStream);
             document.metadata().put("docId", docId);
             
@@ -95,8 +101,8 @@ public class RAGService {
             }
 
             // BƯỚC 2: CẮT NHỎ TÀI LIỆU
-            var splitter = DocumentSplitters.recursive(500, 0);
-            List<TextSegment> segments = splitter.split(document);
+            CustomRecursiveSplitter mySplitter = new CustomRecursiveSplitter(500, 0);
+            List<TextSegment> segments = mySplitter.split(document);
             System.out.println("Tổng số segments cần xử lý: " + segments.size());
 
             // BƯỚC 3: TẠO VECTOR (Chiến thuật Ultra Safe để tránh lỗi Quota)
@@ -146,22 +152,25 @@ public class RAGService {
     }
 
     // --- RETRIEVAL ---
-    public StudyAssistant createAssistantForDocument(String docId) {
-        Filter filter = MetadataFilterBuilder.metadataKey("docId").isEqualTo(docId);
-        EmbeddingStoreContentRetriever retriever = EmbeddingStoreContentRetriever.builder()
-                .embeddingStore(embeddingStore)
-                .embeddingModel(embeddingModel)
-                .filter(filter)
-                .maxResults(5)
-                .minScore(0.7)
-                .build();
+    public StudyAssistant getOrCreateAssistantForDocument(String docId) {
+        return assistantCache.computeIfAbsent(docId, id -> {
+            System.out.println("🧠 Creating new Assistant for docId: " + id);
+            Filter filter = MetadataFilterBuilder.metadataKey("docId").isEqualTo(id);
+            EmbeddingStoreContentRetriever retriever = EmbeddingStoreContentRetriever.builder()
+                    .embeddingStore(embeddingStore)
+                    .embeddingModel(embeddingModel)
+                    .filter(filter)
+                    .maxResults(5)
+                    .minScore(0.7)
+                    .build();
 
-        return AiServices.builder(StudyAssistant.class)
-                .chatLanguageModel(chatModel)
-                .chatMemory(MessageWindowChatMemory.withMaxMessages(10))
-                .retrievalAugmentor(DefaultRetrievalAugmentor.builder()
-                        .contentRetriever(retriever)
-                        .build())
-                .build();
+            return AiServices.builder(StudyAssistant.class)
+                    .chatLanguageModel(chatModel)
+                    .chatMemory(MessageWindowChatMemory.withMaxMessages(10))
+                    .retrievalAugmentor(DefaultRetrievalAugmentor.builder()
+                            .contentRetriever(retriever)
+                            .build())
+                    .build();
+        });
     }
 }

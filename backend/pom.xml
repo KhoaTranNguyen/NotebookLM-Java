@@ -7,7 +7,7 @@
 	<parent>
 		<groupId>org.springframework.boot</groupId>
 		<artifactId>spring-boot-starter-parent</artifactId>
-		<version>3.2.4</version>
+		<version>3.5.0</version>
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
 	
@@ -92,7 +92,19 @@
 			<artifactId>spring-boot-starter-test</artifactId>
 			<scope>test</scope>
 		</dependency>
-	</dependencies>
+	
+   <dependency>
+     <groupId>org.testng</groupId>
+     <artifactId>testng</artifactId>
+     <version>7.0.0</version>
+   </dependency>
+ 
+   <dependency>
+     <groupId>org.testng</groupId>
+     <artifactId>testng</artifactId>
+     <version>7.0.0</version>
+   </dependency>
+ </dependencies>
 
 	<build>
 		<plugins>

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { LucideBook, LucidePlus, LucideLogOut, LucideFileText, LucideTrash2, LucideMessageSquare, LucideBrain } from 'lucide-react';
+import { LucideBook, LucidePlus, LucideLogOut, LucideFileText, LucideTrash2, LucideMessageSquare, LucideBrain, LucideLoader2 } from 'lucide-react';
 
 // Import Components
 import LoginScreen from './components/LoginScreen';
@@ -184,6 +184,7 @@ export default function App() {
                 sets={savedSets}
                 onSelectSet={handleSelectFlashcardSet} 
                 onRenameSet={handleRenameSet}
+                onDeleteSet={handleDeleteSet}
                 selectedSetId={activeContent.type === 'flashcardSet' ? activeContent.id : null} 
             />
         </div>
@@ -245,7 +246,12 @@ export default function App() {
                             </div>
                             <div className={`h-full ${activeTab === 'flashcard' ? 'block' : 'hidden'}`}>
                                 { (activeContent.type === 'doc') && <FlashcardMode key={`fc-doc-${activeContent.id}`} docId={activeContent.id} /> }
-                                { (activeContent.type === 'flashcardSet') && (activeContent.cards === 'loading' ? <div>Loading cards...</div> : <FlashcardMode key={`fc-set-${activeContent.id}`} initialCards={activeContent.cards} isSavedSet={true} onDelete={() => handleDeleteSet(activeContent.id)} />) }
+                                { (activeContent.type === 'flashcardSet') && (activeContent.cards === 'loading' ? (
+                                    <div className="h-full flex flex-col items-center justify-center text-slate-500">
+                                        <LucideLoader2 size={32} className="animate-spin mb-4" />
+                                        <p className="text-lg font-medium">Loading Card Set...</p>
+                                    </div>
+                                ) : <FlashcardMode key={`fc-set-${activeContent.id}`} initialCards={activeContent.cards} isSavedSet={true} />) }
                             </div>
                         </div>
                     </div>

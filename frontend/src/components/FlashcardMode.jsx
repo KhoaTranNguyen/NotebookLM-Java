@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { LucideBrain, LucideLoader2, LucideRefreshCw, LucideSave, LucideTrash2 } from 'lucide-react';
+import { LucideBrain, LucideLoader2, LucideRefreshCw, LucideSave } from 'lucide-react';
 import { callJavaAI, saveFlashcardSet } from '../api';
 
-export default function FlashcardMode({ docId, initialCards, isSavedSet = false, onDelete }) {
+export default function FlashcardMode({ docId, initialCards, isSavedSet = false }) {
     const [cards, setCards] = useState(initialCards || []);
     const [loading, setLoading] = useState(false);
     const [saving, setSaving] = useState(false);
@@ -77,15 +77,6 @@ export default function FlashcardMode({ docId, initialCards, isSavedSet = false,
              <div className="h-full flex flex-col items-center justify-center p-8 text-center text-slate-500">
                 <LucideBrain size={40} className="mb-4" />
                 <p>This flashcard set is empty.</p>
-                 {isSavedSet && onDelete && (
-                    <button 
-                        onClick={onDelete}
-                        className="absolute bottom-4 right-4 bg-red-500 hover:bg-red-600 text-white p-3 rounded-full shadow-lg"
-                        title="Delete this set"
-                    >
-                        <LucideTrash2 size={20}/>
-                    </button>
-                )}
             </div>
         )
     }
@@ -146,16 +137,6 @@ export default function FlashcardMode({ docId, initialCards, isSavedSet = false,
                     </button>
                 )}
             </div>
-
-            {isSavedSet && onDelete && (
-                <button 
-                    onClick={onDelete}
-                    className="absolute bottom-4 right-4 bg-red-500 hover:bg-red-600 text-white p-3 rounded-full shadow-lg"
-                    title="Delete this set"
-                >
-                    <LucideTrash2 size={20}/>
-                </button>
-            )}
         </div>
     );
 }

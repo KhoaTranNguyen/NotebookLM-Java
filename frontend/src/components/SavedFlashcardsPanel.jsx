@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { BookMarked } from 'lucide-react';
+import { BookMarked, LucideTrash2 } from 'lucide-react';
 
-export default function SavedFlashcardsPanel({ sets = [], onSelectSet, onRenameSet, selectedSetId }) {
+export default function SavedFlashcardsPanel({ sets = [], onSelectSet, onRenameSet, onDeleteSet, selectedSetId }) {
     const [editingSetId, setEditingSetId] = useState(null);
     const [editText, setEditText] = useState("");
     const inputRef = useRef(null);
@@ -39,6 +39,11 @@ export default function SavedFlashcardsPanel({ sets = [], onSelectSet, onRenameS
             setEditText("");
         }
     };
+    
+    const handleDeleteClick = (e, setId) => {
+        e.stopPropagation(); // Prevent the item from being selected
+        onDeleteSet(setId);
+    }
 
     return (
         <div className="p-4 border-t border-slate-200">
@@ -50,31 +55,39 @@ export default function SavedFlashcardsPanel({ sets = [], onSelectSet, onRenameS
                     <p className="text-xs text-slate-400 px-2">Chưa có bộ nào được lưu.</p>
                 ) : (
                     sets.map(set => (
-                        <li key={set.setId}>
-                            <div
-                                onDoubleClick={() => handleDoubleClick(set)}
-                                className={`w-full text-left flex items-center gap-3 p-2 rounded-lg text-sm font-medium transition-colors group ${
+                        <li key={set.setId} className="group">
+                             <div
+                                onDoubleClick={() => editingSetId === null && handleDoubleClick(set)}
+                                onClick={() => editingSetId === null && onSelectSet(set.setId, set.topicName)}
+                                className={`w-full text-left flex items-center justify-between gap-3 p-2 rounded-lg text-sm font-medium transition-colors cursor-pointer ${
                                     selectedSetId === set.setId && editingSetId !== set.setId
                                         ? 'bg-purple-100 text-purple-700'
                                         : 'text-slate-600 hover:bg-slate-100'
                                 }`}
                             >
-                                <BookMarked className="w-4 h-4" />
-                                {editingSetId === set.setId ? (
-                                    <input
-                                        ref={inputRef}
-                                        type="text"
-                                        value={editText}
-                                        onChange={(e) => setEditText(e.target.value)}
-                                        onBlur={handleRename}
-                                        onKeyDown={handleKeyDown}
-                                        className="bg-white text-sm w-full outline-none p-0 -m-1 ring-1 ring-purple-500 rounded"
-                                    />
-                                ) : (
-                                    <button onClick={() => onSelectSet(set.setId, set.topicName)} className="truncate flex-1 text-left">
-                                        {set.topicName}
-                                    </button>
-                                )}
+                                <div className="flex items-center gap-3 truncate">
+                                    <BookMarked className="w-4 h-4 shrink-0" />
+                                    {editingSetId === set.setId ? (
+                                        <input
+                                            ref={inputRef}
+                                            type="text"
+                                            value={editText}
+                                            onChange={(e) => setEditText(e.target.value)}
+                                            onBlur={handleRename}
+                                            onKeyDown={handleKeyDown}
+                                            className="bg-white text-sm w-full outline-none p-0 -m-1 ring-1 ring-purple-500 rounded"
+                                        />
+                                    ) : (
+                                        <span className="truncate">{set.topicName}</span>
+                                    )}
+                                </div>
+                                <button 
+                                    onClick={(e) => handleDeleteClick(e, set.setId)} 
+                                    className="text-slate-300 hover:text-red-500 p-1 rounded-md hover:bg-red-50 opacity-0 group-hover:opacity-100 transition-all shrink-0"
+                                    title="Delete set"
+                                >
+                                    <LucideTrash2 size={14} />
+                                </button>
                             </div>
                         </li>
                     ))

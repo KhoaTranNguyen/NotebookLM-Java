@@ -1,14 +1,25 @@
-import React, { useState } from 'react';
-import { LucideBrain, LucideLoader2, LucideRefreshCw } from 'lucide-react';
-import { callJavaAI } from '../api';
+import React, { useState, useEffect } from 'react';
+import { LucideBrain, LucideLoader2, LucideRefreshCw, LucideSave, LucideTrash2 } from 'lucide-react';
+import { callJavaAI, saveFlashcardSet } from '../api';
 
-export default function FlashcardMode({ docId }) {
-    const [cards, setCards] = useState([]);
+export default function FlashcardMode({ docId, initialCards, isSavedSet = false, onDelete }) {
+    const [cards, setCards] = useState(initialCards || []);
     const [loading, setLoading] = useState(false);
+    const [saving, setSaving] = useState(false);
     const [currentIndex, setCurrentIndex] = useState(0);
     const [isFlipped, setIsFlipped] = useState(false);
 
+    // If a new set of initialCards is passed, reset the view
+    useEffect(() => {
+        if (initialCards) {
+            setCards(initialCards);
+            setCurrentIndex(0);
+            setIsFlipped(false);
+        }
+    }, [initialCards]);
+
     const generateCards = async () => {
+        if (!docId) return;
         setLoading(true);
         const result = await callJavaAI('flashcards', { docId });
         if (result && Array.isArray(result)) {
@@ -21,7 +32,27 @@ export default function FlashcardMode({ docId }) {
         setLoading(false);
     };
 
-    if (cards.length === 0) {
+    const saveCards = async () => {
+        if (cards.length === 0 || isSavedSet) {
+            alert(isSavedSet ? "Bộ này đã được lưu." : "Không có flashcard để lưu.");
+            return;
+        }
+        setSaving(true);
+        try {
+            const userId = 1; // Placeholder
+            const topic = docId ? `Flashcards for Document ${docId}` : `Saved Flashcard Set`;
+            const response = await saveFlashcardSet(userId, topic, cards);
+            alert(response.message || "Flashcard set saved successfully!");
+        } catch (error) {
+            console.error("Failed to save flashcard set:", error);
+            alert("Lưu bộ Flashcard thất bại: " + error.message);
+        } finally {
+            setSaving(false);
+        }
+    };
+
+    // Show generate screen only if there are no initial cards and a docId is provided
+    if (cards.length === 0 && docId && !initialCards) {
         return (
             <div className="h-full flex flex-col items-center justify-center p-8 text-center">
                 <div className="w-20 h-20 bg-purple-100 text-purple-600 rounded-full flex items-center justify-center mb-6 shadow-sm">
@@ -38,6 +69,25 @@ export default function FlashcardMode({ docId }) {
                 </button>
             </div>
         );
+    }
+    
+    // If there are no cards (e.g., an empty saved set was loaded), show a simple message.
+    if (cards.length === 0) {
+        return (
+             <div className="h-full flex flex-col items-center justify-center p-8 text-center text-slate-500">
+                <LucideBrain size={40} className="mb-4" />
+                <p>This flashcard set is empty.</p>
+                 {isSavedSet && onDelete && (
+                    <button 
+                        onClick={onDelete}
+                        className="absolute bottom-4 right-4 bg-red-500 hover:bg-red-600 text-white p-3 rounded-full shadow-lg"
+                        title="Delete this set"
+                    >
+                        <LucideTrash2 size={20}/>
+                    </button>
+                )}
+            </div>
+        )
     }
 
     return (
@@ -79,9 +129,33 @@ export default function FlashcardMode({ docId }) {
                 </button>
             </div>
             
-            <button onClick={generateCards} className="absolute top-4 right-4 text-slate-400 hover:text-purple-600 p-2" title="Tạo lại bộ mới">
-                <LucideRefreshCw size={20}/>
-            </button>
+            <div className="absolute top-4 right-4 flex gap-2">
+                <button 
+                    onClick={saveCards} 
+                    disabled={saving || isSavedSet}
+                    className={`p-2 flex items-center gap-1 ${isSavedSet ? 'text-slate-400 cursor-default' : 'text-slate-400 hover:text-green-600'}`}
+                    title={isSavedSet ? "Bộ flashcard đã được lưu" : "Lưu bộ Flashcard"}
+                >
+                    {saving ? <LucideLoader2 className="w-4 h-4 animate-spin" /> : <LucideSave size={20}/>}
+                    <span className="text-sm">{saving ? "Đang lưu..." : (isSavedSet ? "Đã lưu" : "Lưu")}</span>
+                </button>
+                {/* Only show the regenerate button if we are in a document context */}
+                {docId && (
+                    <button onClick={generateCards} className="text-slate-400 hover:text-purple-600 p-2" title="Tạo lại bộ mới">
+                        <LucideRefreshCw size={20}/>
+                    </button>
+                )}
+            </div>
+
+            {isSavedSet && onDelete && (
+                <button 
+                    onClick={onDelete}
+                    className="absolute bottom-4 right-4 bg-red-500 hover:bg-red-600 text-white p-3 rounded-full shadow-lg"
+                    title="Delete this set"
+                >
+                    <LucideTrash2 size={20}/>
+                </button>
+            )}
         </div>
     );
 }

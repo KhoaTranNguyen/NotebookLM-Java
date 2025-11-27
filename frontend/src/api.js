@@ -98,3 +98,112 @@ export async function callJavaAI(endpoint, payload) {
         return null;
     }
 }
+
+/**
+ * Saves a set of flashcards to the backend.
+ * @param {Long} userId - The ID of the user.
+ * @param {string} topic - The topic of the flashcard set.
+ * @param {Array<Object>} flashcards - An array of flashcard objects.
+ * @returns {Promise<any>} The response from the backend.
+ */
+export async function saveFlashcardSet(userId, topic, flashcards) {
+    try {
+        const response = await fetch(`${RAG_API_URL}/flashcards/save`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ userId, topic, flashcards })
+        });
+
+        if (!response.ok) {
+            const errText = await response.text();
+            console.error(`Java Server Error (saveFlashcardSet):`, errText);
+            throw new Error(errText || 'Failed to save flashcard set');
+        }
+
+        return await response.json();
+    } catch (error) {
+        console.error(`Network Error calling saveFlashcardSet:`, error);
+        throw error;
+    }
+}
+
+/**
+ * Fetches the list of saved flashcard sets for the current user.
+ * @returns {Promise<Array<Object>>} A list of flashcard set metadata objects.
+ */
+export async function getFlashcardSets() {
+    try {
+        const response = await fetch(`${RAG_API_URL}/flashcards/sets`);
+        if (!response.ok) {
+            const errText = await response.text();
+            throw new Error(errText || 'Failed to fetch flashcard sets');
+        }
+        return await response.json();
+    } catch (error) {
+        console.error("Network Error calling getFlashcardSets:", error);
+        throw error;
+    }
+}
+
+/**
+ * Fetches the full data for a specific flashcard set.
+ * @param {number} setId - The ID of the flashcard set to fetch.
+ * @returns {Promise<Array<Object>>} An array of flashcard objects.
+ */
+export async function getFlashcardSet(setId) {
+    try {
+        const response = await fetch(`${RAG_API_URL}/flashcards/set/${setId}`);
+        if (!response.ok) {
+            const errText = await response.text();
+            throw new Error(errText || 'Failed to fetch flashcard set');
+        }
+        return await response.json();
+    } catch (error) {
+        throw error;
+    }
+}
+
+/**
+ * Deletes a specific flashcard set from the backend.
+ * @param {number} setId - The ID of the flashcard set to delete.
+ * @returns {Promise<any>} The success message from the backend.
+ */
+export async function deleteFlashcardSet(setId) {
+    try {
+        const response = await fetch(`${RAG_API_URL}/flashcards/set/${setId}`, {
+            method: 'DELETE'
+        });
+        if (!response.ok) {
+            const errText = await response.text();
+            throw new Error(errText || 'Failed to delete flashcard set');
+        }
+        return await response.json();
+    } catch (error) {
+        console.error(`Network Error calling deleteFlashcardSet(${setId}):`, error);
+        throw error;
+    }
+}
+
+/**
+ * Updates the topic/name of a specific flashcard set.
+ * @param {number} setId - The ID of the flashcard set to update.
+ * @param {string} newTopic - The new topic name.
+ * @returns {Promise<any>} The success message from the backend.
+ */
+export async function updateFlashcardSetTopic(setId, newTopic) {
+    try {
+        const response = await fetch(`${RAG_API_URL}/flashcards/set/${setId}/topic`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ topic: newTopic })
+        });
+        if (!response.ok) {
+            const errText = await response.text();
+            throw new Error(errText || 'Failed to update topic');
+        }
+        return await response.json();
+    } catch (error) {
+        console.error(`Network Error calling updateFlashcardSetTopic(${setId}):`, error);
+        throw error;
+    }
+}

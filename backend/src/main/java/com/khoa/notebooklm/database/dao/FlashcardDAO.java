@@ -3,6 +3,7 @@ package com.khoa.notebooklm.database.dao;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.khoa.notebooklm.database.model.Flashcard;
+import com.khoa.notebooklm.model.FlashcardSetInfo;
 import org.springframework.stereotype.Repository;
 
 import javax.sql.DataSource;
@@ -65,6 +66,53 @@ public class FlashcardDAO {
             stmt.setString(1, json);
             stmt.setInt(2, setId);
 
+            stmt.executeUpdate();
+        }
+    }
+
+    // 4. Get all Flashcard Sets for a user
+    public List<FlashcardSetInfo> getFlashcardSetsByUserId(long userId) throws SQLException {
+        List<FlashcardSetInfo> sets = new ArrayList<>();
+        String sql = "SELECT set_id, topic_name, created_at FROM flashcards WHERE user_id = ? ORDER BY created_at DESC";
+
+        try (Connection conn = dataSource.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setLong(1, userId);
+            ResultSet rs = stmt.executeQuery();
+
+            while (rs.next()) {
+                sets.add(new FlashcardSetInfo(
+                    rs.getInt("set_id"),
+                    rs.getString("topic_name"),
+                    rs.getTimestamp("created_at")
+                ));
+            }
+        }
+        return sets;
+    }
+
+    // 5. Delete Flashcard Set
+    public void deleteFlashcardSet(int setId) throws SQLException {
+        String sql = "DELETE FROM flashcards WHERE set_id = ?";
+
+        try (Connection conn = dataSource.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setInt(1, setId);
+            stmt.executeUpdate();
+        }
+    }
+
+    // 6. Update Flashcard Set Topic
+    public void updateFlashcardSetTopic(int setId, String newTopic) throws SQLException {
+        String sql = "UPDATE flashcards SET topic_name = ? WHERE set_id = ?";
+
+        try (Connection conn = dataSource.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setString(1, newTopic);
+            stmt.setInt(2, setId);
             stmt.executeUpdate();
         }
     }

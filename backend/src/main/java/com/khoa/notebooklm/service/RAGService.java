@@ -2,8 +2,7 @@ package com.khoa.notebooklm.service;
 
 import com.khoa.notebooklm.base_class.Document;
 import com.khoa.notebooklm.base_class.PdfDocumentParser;
-
-import com.khoa.notebooklm.base_class.CustomRecursiveSplitter;
+import com.khoa.notebooklm.base_splitter.*;
 
 import dev.langchain4j.data.embedding.Embedding;
 import dev.langchain4j.data.segment.TextSegment;
@@ -101,8 +100,11 @@ public class RAGService {
             }
 
             // BƯỚC 2: CẮT NHỎ TÀI LIỆU
-            CustomRecursiveSplitter mySplitter = new CustomRecursiveSplitter(500, 0);
-            List<TextSegment> segments = mySplitter.split(document);
+            // var splitter = DocumentSplitters.recursive(500, 0);
+            // List<TextSegment> segments = splitter.split(document);
+
+            MyDocumentSplitter splitter = MyDocumentSplitters.recursive(500, 0);
+            List<TextSegment> segments = splitter.split(document);
             System.out.println("Tổng số segments cần xử lý: " + segments.size());
 
             // BƯỚC 3: TẠO VECTOR (Chiến thuật Ultra Safe để tránh lỗi Quota)

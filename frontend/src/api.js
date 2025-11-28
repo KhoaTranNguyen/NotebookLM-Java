@@ -100,6 +100,22 @@ export async function callJavaAI(endpoint, payload) {
 }
 
 /**
+ * Deletes a document from the backend.
+ * @param {number} docId - The ID of the document to delete.
+ * @returns {Promise<any>} The success message from the backend.
+ */
+export async function deleteDocument(docId) {
+    const response = await fetch(`${DOC_API_URL}/${docId}`, {
+        method: 'DELETE'
+    });
+    if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.error || 'Failed to delete document');
+    }
+    return response.json();
+}
+
+/**
  * Saves a set of flashcards to the backend.
  * @param {Long} userId - The ID of the user.
  * @param {string} topic - The topic of the flashcard set.

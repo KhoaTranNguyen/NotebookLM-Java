@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { LucideBrain, LucideLoader2, LucideRefreshCw, LucideSave } from 'lucide-react';
 import { callJavaAI, saveFlashcardSet } from '../api';
 
-export default function FlashcardMode({ docId, initialCards, isSavedSet = false }) {
+export default function FlashcardMode({ docId, initialCards, isSavedSet = false, onSetSaved }) {
     const [cards, setCards] = useState(initialCards || []);
     const [loading, setLoading] = useState(false);
     const [saving, setSaving] = useState(false);
@@ -43,6 +43,9 @@ export default function FlashcardMode({ docId, initialCards, isSavedSet = false 
             const topic = docId ? `Flashcards for Document ${docId}` : `Saved Flashcard Set`;
             const response = await saveFlashcardSet(userId, topic, cards);
             alert(response.message || "Flashcard set saved successfully!");
+            if (onSetSaved) {
+                onSetSaved(); // Notify parent to refresh the list
+            }
         } catch (error) {
             console.error("Failed to save flashcard set:", error);
             alert("Lưu bộ Flashcard thất bại: " + error.message);

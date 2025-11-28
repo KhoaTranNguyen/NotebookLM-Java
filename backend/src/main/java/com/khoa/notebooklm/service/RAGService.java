@@ -17,6 +17,7 @@ import dev.langchain4j.service.AiServices;
 import dev.langchain4j.store.embedding.EmbeddingStore;
 import dev.langchain4j.store.embedding.filter.Filter;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
@@ -105,5 +106,20 @@ public class RAGService {
                             .build())
                     .build();
         });
+    }
+
+    @Transactional(rollbackFor = SQLException.class)
+    public void deleteDocumentAndChunks(int docId) throws SQLException {
+        // Step 1: Invalidate cache if an assistant for this doc exists
+        assistantCache.remove(docId);
+        System.out.println("🧠 Assistant for docId " + docId + " removed from cache.");
+
+        // Step 2: Delete all chunks from the document_chunks table
+        documentDAO.deleteChunksByDocId(docId);
+
+        // Step 3: Delete the document entry from the documents table
+        documentDAO.deleteDocument(docId);
+
+        System.out.println("🎉 Successfully deleted document and all associated chunks for docId: " + docId);
     }
 }

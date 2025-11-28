@@ -5,7 +5,7 @@ import { LucideBook, LucidePlus, LucideLogOut, LucideFileText, LucideTrash2, Luc
 import LoginScreen from './components/LoginScreen';
 import ChatMode from './components/ChatMode';
 import FlashcardMode from './components/FlashcardMode';
-import { uploadDocument, getDocuments, getFlashcardSet, getFlashcardSets, deleteFlashcardSet, updateFlashcardSetTopic } from './api';
+import { uploadDocument, getDocuments, getFlashcardSet, getFlashcardSets, deleteFlashcardSet, updateFlashcardSetTopic, deleteDocument } from './api';
 import SavedFlashcardsPanel from './components/SavedFlashcardsPanel';
 
 
@@ -81,10 +81,23 @@ export default function App() {
     }
   };
   
-  const handleDeleteDoc = (docId) => {
-      // TODO: Implement backend document deletion
-      alert(`Deletion not implemented yet. Would delete document with ID: ${docId}`);
-  }
+  const handleDeleteDoc = async (docId) => {
+      const isConfirmed = window.confirm("Are you sure you want to delete this document? All associated data (chunks and embeddings) will be permanently removed.");
+      if (isConfirmed) {
+          try {
+              await deleteDocument(docId);
+              // If the deleted doc is the one being viewed, go back to home screen
+              if (activeContent.type === 'doc' && activeContent.id === docId) {
+                  setActiveContent({ type: 'none' });
+              }
+              // Refresh the document list
+              await fetchDocuments();
+          } catch(err) {
+              console.error("Failed to delete document:", err);
+              alert("Error: " + err.message);
+          }
+      }
+  };
 
   // When a document is selected from the library
   const handleSelectDocument = (doc) => {
@@ -123,6 +136,12 @@ export default function App() {
               alert("Error: Could not delete the flashcard set.");
           }
       }
+  };
+
+  const handleSetSaved = async () => {
+    // This function will be called by the child component after a save operation
+    // to trigger a refresh of the sets list.
+    await fetchSavedSets();
   };
 
   const handleRenameSet = async (setId, newName) => {
@@ -245,7 +264,7 @@ export default function App() {
                                 <ChatMode key={`chat-${activeContent.id}`} docId={activeContent.id} />
                             </div>
                             <div className={`h-full ${activeTab === 'flashcard' ? 'block' : 'hidden'}`}>
-                                { (activeContent.type === 'doc') && <FlashcardMode key={`fc-doc-${activeContent.id}`} docId={activeContent.id} /> }
+                                { (activeContent.type === 'doc') && <FlashcardMode key={`fc-doc-${activeContent.id}`} docId={activeContent.id} onSetSaved={handleSetSaved} /> }
                                 { (activeContent.type === 'flashcardSet') && (activeContent.cards === 'loading' ? (
                                     <div className="h-full flex flex-col items-center justify-center text-slate-500">
                                         <LucideLoader2 size={32} className="animate-spin mb-4" />

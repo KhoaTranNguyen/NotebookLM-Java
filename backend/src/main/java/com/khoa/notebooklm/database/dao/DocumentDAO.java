@@ -157,4 +157,16 @@ public class DocumentDAO {
             System.out.println("🗑️ Document deleted.");
         }
     }
+
+    // 7. Delete all chunks for a document
+    public void deleteChunksByDocId(int docId) throws SQLException {
+        String sql = "DELETE FROM document_chunks WHERE document_id = ?";
+        try (Connection conn = dataSource.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setInt(1, docId);
+            int rowsAffected = stmt.executeUpdate();
+            System.out.println("🗑️ Deleted " + rowsAffected + " chunks for document ID: " + docId);
+        }
+    }
 }

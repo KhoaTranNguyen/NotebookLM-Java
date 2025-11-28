@@ -2,6 +2,7 @@ package com.khoa.notebooklm.controller;
 
 import com.khoa.notebooklm.database.dao.DocumentDAO;
 import com.khoa.notebooklm.database.model.Document;
+import com.khoa.notebooklm.service.RAGService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -15,9 +16,11 @@ import java.util.Map;
 public class DocumentController {
 
     private final DocumentDAO documentDAO;
+    private final RAGService ragService;
 
-    public DocumentController(DocumentDAO documentDAO) {
+    public DocumentController(DocumentDAO documentDAO, RAGService ragService) {
         this.documentDAO = documentDAO;
+        this.ragService = ragService;
     }
 
     @GetMapping
@@ -30,6 +33,18 @@ public class DocumentController {
             return ResponseEntity.ok(documents);
         } catch (SQLException e) {
             return ResponseEntity.internalServerError().body(Map.of("error", "Database error fetching documents."));
+        }
+    }
+
+    @DeleteMapping("/{docId}")
+    public ResponseEntity<?> deleteDocument(@PathVariable int docId) {
+        // TODO: Add security check to ensure user owns this document
+        try {
+            ragService.deleteDocumentAndChunks(docId);
+            return ResponseEntity.ok(Map.of("message", "Document and associated chunks deleted successfully."));
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return ResponseEntity.status(500).body(Map.of("error", "Failed to delete document."));
         }
     }
 }

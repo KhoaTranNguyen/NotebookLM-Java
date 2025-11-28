@@ -37,13 +37,14 @@ public class FlashcardDAO {
     }
 
     // 2. Get Flashcard
-    public List<Flashcard> getFlashcardsBySetId(int setId) throws SQLException {
-        String sql = "SELECT flashcards_json FROM flashcards WHERE set_id = ?";
+    public List<Flashcard> getFlashcardsBySetId(int setId, long userId) throws SQLException {
+        String sql = "SELECT flashcards_json FROM flashcards WHERE set_id = ? AND user_id = ?";
 
         try (Connection conn = dataSource.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
 
             stmt.setInt(1, setId);
+            stmt.setLong(2, userId);
             ResultSet rs = stmt.executeQuery();
 
             if (rs.next()) {
@@ -56,8 +57,8 @@ public class FlashcardDAO {
     }
 
     // 3. Update Flashcard
-    public void updateSetProgress(int setId, List<Flashcard> updatedCards) throws SQLException {
-        String sql = "UPDATE flashcards SET flashcards_json = ? WHERE set_id = ?";
+    public void updateSetProgress(int setId, List<Flashcard> updatedCards, long userId) throws SQLException {
+        String sql = "UPDATE flashcards SET flashcards_json = ? WHERE set_id = ? AND user_id = ?";
 
         try (Connection conn = dataSource.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
@@ -65,6 +66,7 @@ public class FlashcardDAO {
             String json = gson.toJson(updatedCards);
             stmt.setString(1, json);
             stmt.setInt(2, setId);
+            stmt.setLong(3, userId);
 
             stmt.executeUpdate();
         }
@@ -93,26 +95,28 @@ public class FlashcardDAO {
     }
 
     // 5. Delete Flashcard Set
-    public void deleteFlashcardSet(int setId) throws SQLException {
-        String sql = "DELETE FROM flashcards WHERE set_id = ?";
+    public void deleteFlashcardSet(int setId, long userId) throws SQLException {
+        String sql = "DELETE FROM flashcards WHERE set_id = ? AND user_id = ?";
 
         try (Connection conn = dataSource.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
 
             stmt.setInt(1, setId);
+            stmt.setLong(2, userId);
             stmt.executeUpdate();
         }
     }
 
     // 6. Update Flashcard Set Topic
-    public void updateFlashcardSetTopic(int setId, String newTopic) throws SQLException {
-        String sql = "UPDATE flashcards SET topic_name = ? WHERE set_id = ?";
+    public void updateFlashcardSetTopic(int setId, String newTopic, long userId) throws SQLException {
+        String sql = "UPDATE flashcards SET topic_name = ? WHERE set_id = ? AND user_id = ?";
 
         try (Connection conn = dataSource.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
 
             stmt.setString(1, newTopic);
             stmt.setInt(2, setId);
+            stmt.setLong(3, userId);
             stmt.executeUpdate();
         }
     }

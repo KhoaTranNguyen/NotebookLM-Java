@@ -169,4 +169,21 @@ public class DocumentDAO {
             System.out.println("🗑️ Deleted " + rowsAffected + " chunks for document ID: " + docId);
         }
     }
+
+    public Document getDocumentById(int docId) throws SQLException {
+        String sql = "SELECT * FROM documents WHERE document_id = ?";
+        try (Connection conn = dataSource.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setInt(1, docId);
+            ResultSet rs = stmt.executeQuery();
+            if (rs.next()) {
+                Document doc = new Document();
+                doc.setDocumentId(rs.getInt("document_id"));
+                doc.setUserId(rs.getLong("user_id"));
+                doc.setFilename(rs.getString("filename"));
+                return doc;
+            }
+        }
+        return null;
+    }
 }

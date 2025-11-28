@@ -86,8 +86,18 @@ public class RAGService {
         }
     }
 
-    public StudyAssistant getOrCreateAssistantForDocument(int docId) {
+    public StudyAssistant getOrCreateAssistantForDocument(int docId, long userId) {
         return assistantCache.computeIfAbsent(docId, id -> {
+            // Ownership check before creating assistant
+            try {
+                com.khoa.notebooklm.database.model.Document doc = documentDAO.getDocumentById(id);
+                if (doc == null || doc.getUserId() != userId) {
+                    throw new SecurityException("User " + userId + " does not have access to document " + docId);
+                }
+            } catch (SQLException e) {
+                throw new RuntimeException("Database error during ownership check", e);
+            }
+
             System.out.println("🧠 Creating new Assistant for docId: " + id);
             Filter filter = new DocIdFilter(id);
             EmbeddingStoreContentRetriever retriever = EmbeddingStoreContentRetriever.builder()
@@ -109,7 +119,13 @@ public class RAGService {
     }
 
     @Transactional(rollbackFor = SQLException.class)
-    public void deleteDocumentAndChunks(int docId) throws SQLException {
+    public void deleteDocumentAndChunks(int docId, long userId) throws SQLException {
+        // Ownership check
+        com.khoa.notebooklm.database.model.Document doc = documentDAO.getDocumentById(docId);
+        if (doc == null || doc.getUserId() != userId) {
+            throw new SecurityException("User " + userId + " is not authorized to delete document " + docId);
+        }
+
         // Step 1: Invalidate cache if an assistant for this doc exists
         assistantCache.remove(docId);
         System.out.println("🧠 Assistant for docId " + docId + " removed from cache.");

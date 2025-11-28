@@ -29,8 +29,8 @@ export default function LoginScreen({ onLogin }) {
     setError("");
     setSuccess("");
     try {
-      const user = await login(formData.username, formData.password);
-      onLogin(user);
+      await login(formData.username, formData.password);
+      onLogin();
     } catch (error) {
       console.error("Login error", error);
       setError(error.message || "Login failed. Please check credentials and server status.");
@@ -49,9 +49,7 @@ export default function LoginScreen({ onLogin }) {
     setError("");
     setSuccess("");
     try {
-      const { username, firstName, lastName, email, dateOfBirth } = formData;
-      const userDetails = { username, firstName, lastName, email, dateOfBirth };
-      const result = await register(userDetails, formData.password);
+      const result = await register(formData);
       setSuccess(result.message || "Registration successful! Please log in.");
       setMode('login'); // Switch back to login mode
     } catch (error) {

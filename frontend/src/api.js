@@ -2,6 +2,11 @@ const RAG_API_URL = "/api/rag";
 const AUTH_API_URL = "/api/auth";
 const DOC_API_URL = "/api/documents";
 
+function getAuthHeaders() {
+    const token = localStorage.getItem('accessToken');
+    return token ? { 'Authorization': `Bearer ${token}` } : {};
+}
+
 /**
  * Logs in a user.
  * @param {string} username - The username.
@@ -18,17 +23,24 @@ export async function login(username, password) {
         const error = await response.json();
         throw new Error(error.error || 'Login failed');
     }
-    return response.json();
+    const data = await response.json();
+    localStorage.setItem('accessToken', data.access_token);
+    localStorage.setItem('refreshToken', data.refresh_token);
+    return data;
+}
+
+export function logout() {
+    localStorage.removeItem('accessToken');
+    localStorage.removeItem('refreshToken');
 }
 
 /**
  * Registers a new user.
  * @param {object} userDetails - The user details (username, firstName, etc.).
- * @param {string} password - The password.
  * @returns {Promise<any>} The success message from the backend.
  */
-export async function register(userDetails, password) {
-    const response = await fetch(`${AUTH_API_URL}/register?password=${encodeURIComponent(password)}`, {
+export async function register(userDetails) {
+    const response = await fetch(`${AUTH_API_URL}/register`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(userDetails)
@@ -45,7 +57,9 @@ export async function register(userDetails, password) {
  * @returns {Promise<any>} The list of documents.
  */
 export async function getDocuments() {
-    const response = await fetch(DOC_API_URL);
+    const response = await fetch(DOC_API_URL, {
+        headers: getAuthHeaders()
+    });
      if (!response.ok) {
         const error = await response.json();
         throw new Error(error.error || 'Failed to fetch documents');
@@ -63,6 +77,7 @@ export async function uploadDocument(file) {
     try {
         const response = await fetch(`${RAG_API_URL}/upload`, {
             method: 'POST',
+            headers: getAuthHeaders(),
             body: formData
         });
         
@@ -82,7 +97,10 @@ export async function callJavaAI(endpoint, payload) {
     try {
         const response = await fetch(`${RAG_API_URL}/${endpoint}`, {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            headers: {
+                'Content-Type': 'application/json',
+                ...getAuthHeaders()
+            },
             body: JSON.stringify(payload)
         });
         
@@ -106,7 +124,8 @@ export async function callJavaAI(endpoint, payload) {
  */
 export async function deleteDocument(docId) {
     const response = await fetch(`${DOC_API_URL}/${docId}`, {
-        method: 'DELETE'
+        method: 'DELETE',
+        headers: getAuthHeaders()
     });
     if (!response.ok) {
         const error = await response.json();
@@ -126,7 +145,10 @@ export async function saveFlashcardSet(userId, topic, flashcards) {
     try {
         const response = await fetch(`${RAG_API_URL}/flashcards/save`, {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            headers: {
+                'Content-Type': 'application/json',
+                ...getAuthHeaders()
+            },
             body: JSON.stringify({ userId, topic, flashcards })
         });
 
@@ -149,7 +171,9 @@ export async function saveFlashcardSet(userId, topic, flashcards) {
  */
 export async function getFlashcardSets() {
     try {
-        const response = await fetch(`${RAG_API_URL}/flashcards/sets`);
+        const response = await fetch(`${RAG_API_URL}/flashcards/sets`, {
+            headers: getAuthHeaders()
+        });
         if (!response.ok) {
             const errText = await response.text();
             throw new Error(errText || 'Failed to fetch flashcard sets');
@@ -168,7 +192,9 @@ export async function getFlashcardSets() {
  */
 export async function getFlashcardSet(setId) {
     try {
-        const response = await fetch(`${RAG_API_URL}/flashcards/set/${setId}`);
+        const response = await fetch(`${RAG_API_URL}/flashcards/set/${setId}`, {
+            headers: getAuthHeaders()
+        });
         if (!response.ok) {
             const errText = await response.text();
             throw new Error(errText || 'Failed to fetch flashcard set');
@@ -187,7 +213,8 @@ export async function getFlashcardSet(setId) {
 export async function deleteFlashcardSet(setId) {
     try {
         const response = await fetch(`${RAG_API_URL}/flashcards/set/${setId}`, {
-            method: 'DELETE'
+            method: 'DELETE',
+            headers: getAuthHeaders()
         });
         if (!response.ok) {
             const errText = await response.text();
@@ -210,7 +237,10 @@ export async function updateFlashcardSetTopic(setId, newTopic) {
     try {
         const response = await fetch(`${RAG_API_URL}/flashcards/set/${setId}/topic`, {
             method: 'PUT',
-            headers: { 'Content-Type': 'application/json' },
+            headers: {
+                'Content-Type': 'application/json',
+                ...getAuthHeaders()
+            },
             body: JSON.stringify({ topic: newTopic })
         });
         if (!response.ok) {

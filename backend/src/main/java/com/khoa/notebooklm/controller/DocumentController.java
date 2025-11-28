@@ -2,8 +2,10 @@ package com.khoa.notebooklm.controller;
 
 import com.khoa.notebooklm.database.dao.DocumentDAO;
 import com.khoa.notebooklm.database.model.Document;
+import com.khoa.notebooklm.database.model.User;
 import com.khoa.notebooklm.service.RAGService;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.sql.SQLException;
@@ -24,9 +26,8 @@ public class DocumentController {
     }
 
     @GetMapping
-    public ResponseEntity<?> getDocumentsForUser() {
-        // TODO: Get real userId from Spring Security Context
-        long userId = 1L; // Placeholder for the current user
+    public ResponseEntity<?> getDocumentsForUser(@AuthenticationPrincipal User user) {
+        long userId = user.getId();
 
         try {
             List<Document> documents = documentDAO.getDocumentsByUser(userId);
@@ -37,10 +38,11 @@ public class DocumentController {
     }
 
     @DeleteMapping("/{docId}")
-    public ResponseEntity<?> deleteDocument(@PathVariable int docId) {
-        // TODO: Add security check to ensure user owns this document
+    public ResponseEntity<?> deleteDocument(@PathVariable int docId, @AuthenticationPrincipal User user) {
+        long userId = user.getId();
         try {
-            ragService.deleteDocumentAndChunks(docId);
+            // TODO: Add security check to ensure user owns this document
+            ragService.deleteDocumentAndChunks(docId, userId);
             return ResponseEntity.ok(Map.of("message", "Document and associated chunks deleted successfully."));
         } catch (SQLException e) {
             e.printStackTrace();

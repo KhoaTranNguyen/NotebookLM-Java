@@ -5,7 +5,7 @@ import { LucideBook, LucidePlus, LucideLogOut, LucideFileText, LucideTrash2, Luc
 import LoginScreen from './components/LoginScreen';
 import ChatMode from './components/ChatMode';
 import FlashcardMode from './components/FlashcardMode';
-import { uploadDocument, getDocuments, getFlashcardSet, getFlashcardSets, deleteFlashcardSet, updateFlashcardSetTopic, deleteDocument } from './api';
+import { uploadDocument, getDocuments, getFlashcardSet, getFlashcardSets, deleteFlashcardSet, updateFlashcardSetTopic, deleteDocument, logout } from './api';
 import SavedFlashcardsPanel from './components/SavedFlashcardsPanel';
 
 
@@ -20,6 +20,28 @@ export default function App() {
 
   const [isUploading, setIsUploading] = useState(false);
   const [error, setError] = useState('');
+
+  const handleLogout = () => {
+    logout();
+    setUser(null);
+    setDocuments([]);
+    setSavedSets([]);
+    setActiveContent({ type: 'none' });
+  }
+
+  useEffect(() => {
+    const token = localStorage.getItem('accessToken');
+    if (token) {
+      try {
+        const decodedToken = JSON.parse(atob(token.split('.')[1]));
+        setUser({ username: decodedToken.sub });
+      } catch (error) {
+        console.error("Failed to decode token", error);
+        // Handle invalid token, e.g., by logging out
+        handleLogout();
+      }
+    }
+  }, []);
 
   const fetchDocuments = async () => {
       if (!user) return;
@@ -52,16 +74,19 @@ export default function App() {
     }
   }, [user]);
 
-  const handleLogin = (loggedInUser) => {
-    setUser(loggedInUser);
+  const handleLogin = () => {
+    const token = localStorage.getItem('accessToken');
+    if (token) {
+      try {
+        const decodedToken = JSON.parse(atob(token.split('.')[1]));
+        setUser({ username: decodedToken.sub });
+      } catch (error) {
+        console.error("Failed to decode token", error);
+        // Handle invalid token
+        handleLogout();
+      }
+    }
   };
-  
-  const handleLogout = () => {
-    setUser(null);
-    setDocuments([]);
-    setSavedSets([]);
-    setActiveContent({ type: 'none' });
-  }
 
   const handleFileUpload = async (e) => {
     const file = e.target.files[0];
@@ -213,9 +238,9 @@ export default function App() {
             <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
                     <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-blue-500 to-purple-500 text-white flex items-center justify-center font-bold text-xs">
-                        {user.username.charAt(0).toUpperCase()}
+                        {user && user.username.charAt(0).toUpperCase()}
                     </div>
-                    <span className="text-sm font-medium text-slate-700">{user.username}</span>
+                    <span className="text-sm font-medium text-slate-700">{user && user.username}</span>
                 </div>
                 <button onClick={handleLogout} className="text-slate-400 hover:text-red-600 transition-colors" title="Logout">
                     <LucideLogOut size={18}/>

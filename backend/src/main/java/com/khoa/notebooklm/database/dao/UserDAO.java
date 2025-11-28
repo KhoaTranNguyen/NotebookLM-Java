@@ -17,19 +17,15 @@ public class UserDAO {
     }
 
     // 1. Register new user
-    public void registerUser(User user, String rawPassword) throws SQLException {
-        String sql = "INSERT INTO users (username, password_salt, password_hash, first_name, last_name, email, date_of_birth) " +
+    public void registerUser(User user, String encodedPassword) throws SQLException {
+        String sql = "INSERT INTO users (username, password_hash, password_salt, first_name, last_name, email, date_of_birth) " +
                 "VALUES (?, ?, ?, ?, ?, ?, ?)";
-
-        // Generate Security Data
-        String salt = SecurityUtils.generateSalt();
-        String hash = SecurityUtils.hashPassword(rawPassword, salt);
 
         try (Connection conn = dataSource.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setString(1, user.getUsername());
-            stmt.setString(2, salt);
-            stmt.setString(3, hash);
+            stmt.setString(2, encodedPassword);
+            stmt.setString(3, ""); // password_salt is not used anymore
             stmt.setString(4, user.getFirstName());
             stmt.setString(5, user.getLastName());
             stmt.setString(6, user.getEmail());
@@ -37,39 +33,6 @@ public class UserDAO {
             stmt.executeUpdate();
             System.out.println("✅ User registered successfully: " + user.getUsername());
         }
-    }
-
-    // 2. Login user
-    public User loginUser(String username, String rawPassword) throws SQLException {
-        String sql = "SELECT * FROM users WHERE username = ?";
-
-        try (Connection conn = dataSource.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
-
-            stmt.setString(1, username);
-            ResultSet rs = stmt.executeQuery();
-
-            if (rs.next()) {
-                String storedSalt = rs.getString("password_salt");
-                String storedHash = rs.getString("password_hash");
-                String calculatedHash = SecurityUtils.hashPassword(rawPassword, storedSalt);
-
-                if (storedHash.equals(calculatedHash)) {
-                    User user = new User();
-                    user.setId(rs.getLong("id"));
-                    user.setUsername(rs.getString("username"));
-                    user.setFirstName(rs.getString("first_name"));
-                    user.setLastName(rs.getString("last_name"));
-                    user.setEmail(rs.getString("email"));
-                    user.setDateOfBirth(rs.getDate("date_of_birth").toLocalDate());
-                    user.setCreated(rs.getObject("created", LocalDateTime.class));
-                    user.setLastUpdated(rs.getObject("last_updated", LocalDateTime.class));
-
-                    return user;
-                }
-            }
-        }
-        return null;
     }
 
     // 3. Update user info
@@ -98,17 +61,14 @@ public class UserDAO {
     }
 
     // 4. Update password
-    public void updatePassword(long userId, String newRawPassword) throws SQLException {
-        String sql = "UPDATE users SET password_salt = ?, password_hash = ? WHERE id = ?";
-        String newSalt = SecurityUtils.generateSalt();
-        String newHash = SecurityUtils.hashPassword(newRawPassword, newSalt);
+    public void updatePassword(long userId, String newEncodedPassword) throws SQLException {
+        String sql = "UPDATE users SET password_hash = ? WHERE id = ?";
 
         try (Connection conn = dataSource.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
 
-            stmt.setString(1, newSalt);
-            stmt.setString(2, newHash);
-            stmt.setLong(3, userId);
+            stmt.setString(1, newEncodedPassword);
+            stmt.setLong(2, userId);
 
             stmt.executeUpdate();
             System.out.println("🔒 Password changed successfully.");
@@ -129,4 +89,31 @@ public class UserDAO {
             }
         }
     }
+
+    public java.util.Optional<User> findByUsername(String username) {
+        String sql = "SELECT * FROM users WHERE username = ?";
+        try (Connection conn = dataSource.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setString(1, username);
+            ResultSet rs = stmt.executeQuery();
+            if (rs.next()) {
+                User user = new User();
+                user.setId(rs.getLong("id"));
+                user.setUsername(rs.getString("username"));
+                user.setPassword(rs.getString("password_hash"));
+                user.setFirstName(rs.getString("first_name"));
+                user.setLastName(rs.getString("last_name"));
+                user.setEmail(rs.getString("email"));
+                user.setDateOfBirth(rs.getDate("date_of_birth").toLocalDate());
+                user.setCreated(rs.getObject("created", LocalDateTime.class));
+                user.setLastUpdated(rs.getObject("last_updated", LocalDateTime.class));
+                return java.util.Optional.of(user);
+            }
+        }
+        catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return java.util.Optional.empty();
+    }
 }
+

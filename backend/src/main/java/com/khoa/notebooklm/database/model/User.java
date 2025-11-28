@@ -1,12 +1,15 @@
 package com.khoa.notebooklm.database.model;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.Collection;
+import java.util.Collections;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
 
-public class User {
+public class User implements UserDetails {
     private long id; // BIGINT matches long
     private String username;
-    private String passwordSalt;
-    private String passwordHash;
+    private String password;
     private String firstName;
     private String lastName;
     private String email;
@@ -17,10 +20,9 @@ public class User {
     // Constructor
     public User() {}
 
-    public User(String username, String passwordSalt, String passwordHash, String firstName, String lastName, String email, LocalDate dateOfBirth) {
+    public User(String username, String password, String firstName, String lastName, String email, LocalDate dateOfBirth) {
         this.username = username;
-        this.passwordSalt = passwordSalt;
-        this.passwordHash = passwordHash;
+        this.password = password;
         this.firstName = firstName;
         this.lastName = lastName;
         this.email = email;
@@ -36,6 +38,7 @@ public class User {
         this.id = id;
     }
 
+    @Override
     public String getUsername() {
         return username;
     }
@@ -44,20 +47,13 @@ public class User {
         this.username = username;
     }
 
-    public String getPasswordHash() {
-        return passwordHash;
+    @Override
+    public String getPassword() {
+        return password;
     }
 
-    public void setPasswordHash(String passwordHash) {
-        this.passwordHash = passwordHash;
-    }
-
-    public String getPasswordSalt() {
-        return passwordSalt;
-    }
-
-    public void setPasswordSalt(String passwordSalt) {
-        this.passwordSalt = passwordSalt;
+    public void setPassword(String password) {
+        this.password = password;
     }
 
     public String getFirstName() {
@@ -106,5 +102,30 @@ public class User {
 
     public void setLastUpdated(LocalDateTime lastUpdated) {
         this.lastUpdated = lastUpdated;
+    }
+
+    @Override
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        return Collections.emptyList();
+    }
+
+    @Override
+    public boolean isAccountNonExpired() {
+        return true;
+    }
+
+    @Override
+    public boolean isAccountNonLocked() {
+        return true;
+    }
+
+    @Override
+    public boolean isCredentialsNonExpired() {
+        return true;
+    }
+
+    @Override
+    public boolean isEnabled() {
+        return true;
     }
 }

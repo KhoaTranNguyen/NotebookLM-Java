@@ -1,0 +1,227 @@
+/* IBM Carbon Design System - JavaFX Theme */
+
+.root {
+    /* Color Tokens */
+    -color-ui-01: #f4f4f4; /* Page background */
+    -color-ui-02: #ffffff; /* Container background */
+    -color-ui-03: #e0e0e0; /* Subtle border */
+    -color-ui-04: #8d8d8d; /* Strong border */
+    -color-ui-05: #161616; /* Text primary */
+    
+    -color-text-01: #161616; /* Primary text */
+    -color-text-02: #525252; /* Secondary text */
+    -color-text-03: #a8a8a8; /* Placeholder text */
+    -color-text-04: #ffffff; /* Inverse text */
+    
+    -color-interactive-01: #0f62fe; /* Primary action */
+    -color-interactive-01-hover: #0353e9;
+    -color-interactive-02: #393939; /* Secondary action */
+    -color-interactive-04: #da1e28; /* Danger */
+    
+    -fx-background-color: -color-ui-01;
+    -fx-font-family: "IBM Plex Sans", "Segoe UI", sans-serif;
+    -fx-font-size: 14px;
+}
+
+/* --- Layout & Containers --- */
+
+.cds-container {
+    -fx-padding: 32;
+    -fx-background-color: -color-ui-01;
+}
+
+.cds-section {
+    -fx-spacing: 24;
+}
+
+.cds-card {
+    -fx-background-color: -color-ui-02;
+    -fx-background-radius: 0; /* Carbon is sharp */
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 4, 0, 0, 2);
+    -fx-padding: 24;
+}
+
+.cds-inline-gap {
+    -fx-spacing: 16;
+}
+
+/* --- Typography --- */
+
+.label {
+    -fx-text-fill: -color-text-01;
+}
+
+.cds-title {
+    -fx-font-size: 32px; /* Carbon Heading-05 */
+    -fx-font-weight: normal; /* Carbon uses font-weight for hierarchy, often regular for large headings */
+    -fx-text-fill: -color-text-01;
+}
+
+.cds-subtitle {
+    -fx-font-size: 20px; /* Carbon Heading-03 */
+    -fx-text-fill: -color-text-02;
+}
+
+/* --- Buttons --- */
+
+.button {
+    -fx-background-color: -color-interactive-01;
+    -fx-text-fill: -color-text-04;
+    -fx-background-radius: 0;
+    -fx-padding: 11 15 11 15; /* Height 48px target */
+    -fx-font-size: 14px;
+    -fx-cursor: hand;
+    -fx-alignment: CENTER_LEFT; /* Carbon buttons often align text left with icon, but center is fine */
+}
+
+.button:hover {
+    -fx-background-color: -color-interactive-01-hover;
+}
+
+.button:pressed {
+    -fx-background-color: #002d9c;
+}
+
+/* Danger / Delete Buttons */
+.button.danger {
+    -fx-background-color: -color-interactive-04;
+}
+
+/* Ghost / Secondary Buttons (if needed, can add style class) */
+.button.secondary {
+    -fx-background-color: transparent;
+    -fx-border-color: -color-interactive-01;
+    -fx-border-width: 1;
+    -fx-text-fill: -color-interactive-01;
+}
+
+.button.secondary:hover {
+    -fx-background-color: #e5f1ff; /* Light blue hover */
+}
+
+/* --- Text Inputs --- */
+
+.text-field, .password-field, .text-area {
+    -fx-background-color: #f4f4f4; /* Light gray background */
+    -fx-background-radius: 0;
+    -fx-border-color: transparent transparent -color-ui-04 transparent; /* Bottom border only */
+    -fx-border-width: 0 0 1 0;
+    -fx-padding: 11 15;
+    -fx-text-fill: -color-text-01;
+    -fx-prompt-text-fill: -color-text-03;
+}
+
+.text-field:focused, .password-field:focused, .text-area:focused {
+    -fx-border-color: -color-interactive-01;
+    -fx-border-width: 2; /* Full border on focus or just thick bottom? Carbon is usually thick outline */
+}
+
+/* --- ListView --- */
+
+.list-view {
+    -fx-background-color: -color-ui-01;
+    -fx-background-insets: 0;
+    -fx-padding: 0;
+}
+
+.list-cell {
+    -fx-background-color: -color-ui-01;
+    -fx-text-fill: -color-text-01;
+    -fx-padding: 12 16;
+    -fx-cell-size: 48px; /* Taller rows */
+    -fx-border-color: transparent transparent -color-ui-03 transparent;
+    -fx-border-width: 0 0 1 0;
+}
+
+.list-cell:filled:hover {
+    -fx-background-color: #e5e5e5; /* Hover gray */
+}
+
+.list-cell:filled:selected {
+    -fx-background-color: #e0e0e0; /* Selected gray */
+    -fx-text-fill: -color-text-01;
+    -fx-border-color: -color-interactive-01;
+    -fx-border-width: 0 0 0 4; /* Left blue bar */
+    -fx-border-insets: 0;
+}
+
+.list-cell:filled:selected:hover {
+    -fx-background-color: #e5f1ff;
+    -fx-text-fill: -color-text-01;
+}
+
+.list-cell:empty {
+    -fx-background-color: transparent;
+    -fx-border-width: 0;
+}
+
+/* --- TabPane --- */
+
+.tab-pane {
+    -fx-tab-min-height: 40px;
+}
+
+.tab-header-background {
+    -fx-background-color: -color-ui-01;
+}
+
+.tab {
+    -fx-background-color: transparent;
+    -fx-background-radius: 0;
+    -fx-border-color: transparent;
+    -fx-padding: 10 20;
+}
+
+.tab:selected {
+    -fx-border-color: -color-interactive-01;
+    -fx-border-width: 0 0 2 0; /* Bottom blue line */
+}
+
+.tab-label {
+    -fx-text-fill: -color-text-02;
+    -fx-font-size: 14px;
+}
+
+.tab:selected .tab-label {
+    -fx-text-fill: -color-interactive-01;
+    -fx-font-weight: bold;
+}
+
+/* --- ScrollBar --- */
+
+.scroll-bar:vertical, .scroll-bar:horizontal {
+    -fx-background-color: transparent;
+}
+
+.scroll-bar .thumb {
+    -fx-background-color: #8d8d8d;
+    -fx-background-radius: 0;
+}
+
+/* --- Separator --- */
+.separator .line {
+    -fx-border-color: -color-ui-03;
+    -fx-border-width: 1 0 0 0;
+}
+
+/* --- Flashcard Player --- */
+.flashcard-pane {
+    -fx-background-color: -color-ui-02;
+    -fx-border-color: -color-ui-03;
+    -fx-border-width: 1;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.05), 4, 0, 0, 2);
+}
+
+/* --- Contained List --- */
+
+.contained-list {
+    -fx-background-color: -color-ui-02;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 2, 0, 0, 1);
+}
+
+.contained-list-header {
+    -fx-padding: 16;
+    -fx-background-color: -color-ui-01;
+    -fx-border-color: -color-ui-03;
+    -fx-border-width: 0 0 1 0;
+}

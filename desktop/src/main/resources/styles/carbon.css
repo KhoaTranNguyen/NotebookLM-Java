@@ -113,7 +113,7 @@
 
 .text-field:focused, .password-field:focused, .text-area:focused {
     -fx-border-color: -color-interactive-01;
-    -fx-border-width: 2; /* Full border on focus or just thick bottom? Carbon is usually thick outline */
+    -fx-border-width: 2; /* restore to 2px */
 }
 
 /* --- ListView --- */
@@ -141,7 +141,7 @@
     -fx-background-color: #e0e0e0; /* Selected gray */
     -fx-text-fill: -color-text-01;
     -fx-border-color: -color-interactive-01;
-    -fx-border-width: 0 0 0 4; /* Left blue bar */
+    -fx-border-width: 0 0 0 4; /* Left blue bar restored to 4px */
     -fx-border-insets: 0;
 }
 
@@ -162,19 +162,28 @@
 }
 
 .tab-header-background {
-    -fx-background-color: -color-ui-01;
+    -fx-background-color: -color-ui-02; /* White background to match content */
+    -fx-border-color: -color-ui-03;
+    -fx-border-width: 0 0 1 0; /* Thin grey separator */
+}
+
+.tab-header-area {
+    -fx-padding: 0;
 }
 
 .tab {
     -fx-background-color: transparent;
     -fx-background-radius: 0;
     -fx-border-color: transparent;
-    -fx-padding: 10 20;
+    -fx-padding: 12 16; /* Match contained-list-header padding */
+    -fx-focus-color: transparent;
+    -fx-faint-focus-color: transparent;
 }
 
 .tab:selected {
     -fx-border-color: -color-interactive-01;
-    -fx-border-width: 0 0 2 0; /* Bottom blue line */
+    -fx-border-width: 0 0 2 0; /* Bottom blue line restored to 2px */
+    -fx-border-insets: 0 0 -1 0; /* Overlap the separator */
 }
 
 .tab-label {
@@ -216,12 +225,44 @@
 
 .contained-list {
     -fx-background-color: -color-ui-02;
-    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 2, 0, 0, 1);
+    -fx-border-color: -color-ui-03;
+    -fx-border-width: 1;
 }
 
 .contained-list-header {
-    -fx-padding: 16;
-    -fx-background-color: -color-ui-01;
+    -fx-padding: 12 16;
+    -fx-background-color: -color-ui-02;
     -fx-border-color: -color-ui-03;
     -fx-border-width: 0 0 1 0;
+}
+
+.list-view {
+    -fx-background-color: transparent;
+    -fx-padding: 0;
+    -fx-background-insets: 0;
+}
+
+.list-cell {
+    -fx-background-color: -color-ui-02;
+    -fx-padding: 12 16;
+    -fx-border-color: -color-ui-03;
+    -fx-border-width: 0 0 1 0;
+    -fx-text-fill: -color-text-01;
+}
+
+.list-cell:filled:hover {
+    -fx-background-color: #e0e0e0; /* Grey shade on hover */
+}
+
+.list-cell:filled:selected, .list-cell:filled:selected:hover {
+    -fx-background-color: -color-ui-02;
+    -fx-border-color: -color-interactive-01;
+    -fx-border-width: 1; /* restore to 2px */
+    -fx-border-insets: 0; /* Draw border over the divider */
+    -fx-text-fill: -color-text-01;
+}
+
+.list-cell:empty {
+    -fx-background-color: transparent;
+    -fx-border-width: 0;
 }

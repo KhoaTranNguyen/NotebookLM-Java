@@ -60,7 +60,7 @@ public class RAGController {
         this.documentDao = new DocumentDao();
     }
 
-    public void ingestDocument(long userId, File pdfFile) {
+    public int ingestDocument(long userId, File pdfFile) {
         try (FileInputStream inputStream = new FileInputStream(pdfFile)) {
             System.out.println("--- Starting PDF processing for user: " + userId + " ---");
 
@@ -96,6 +96,7 @@ public class RAGController {
 
             System.out.println("🎉 Document ingestion complete. DB ID: " + docId);
 
+            return docId;
         } catch (Exception e) {
             throw new RuntimeException("Fatal error during document ingestion: " + e.getMessage(), e);
         }

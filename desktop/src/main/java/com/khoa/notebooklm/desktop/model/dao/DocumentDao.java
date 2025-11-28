@@ -46,6 +46,23 @@ public class DocumentDao {
         return out;
     }
 
+    public List<DocumentRow> listDocumentsByUserId(long userId) {
+        String sql = "SELECT document_id, filename FROM documents WHERE user_id = ? ORDER BY document_id DESC";
+        List<DocumentRow> out = new ArrayList<>();
+        try (Connection c = Database.get().getConnection();
+             PreparedStatement ps = c.prepareStatement(sql)) {
+            ps.setLong(1, userId);
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    out.add(new DocumentRow(rs.getLong(1), rs.getString(2)));
+                }
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+        return out;
+    }
+
     /**
      * Returns textual content used for RAG. If your schema stores chunks, this can aggregate them.
      */

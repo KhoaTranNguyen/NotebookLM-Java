@@ -37,14 +37,15 @@ public class LoginView {
         password.setId("login-password");
 
         // Registration fields (initially hidden)
+        PasswordField confirmPass = new PasswordField(); confirmPass.setPromptText("Confirm password");
         TextField firstName = new TextField(); firstName.setPromptText("First name");
         TextField lastName = new TextField(); lastName.setPromptText("Last name");
         TextField email = new TextField(); email.setPromptText("Email");
         DatePicker dob = new DatePicker(); dob.setPromptText("Date of birth");
-        PasswordField confirmPass = new PasswordField(); confirmPass.setPromptText("Confirm password");
+        dob.setMaxWidth(Double.MAX_VALUE); // Make date picker fill width
 
         VBox regBox = new VBox(16);
-        regBox.getChildren().addAll(firstName, lastName, email, dob, confirmPass);
+        regBox.getChildren().addAll(confirmPass, firstName, lastName, email, dob);
         regBox.setVisible(false);
         regBox.managedProperty().bind(regBox.visibleProperty());
 
@@ -70,7 +71,14 @@ public class LoginView {
             if (!isRegister[0]) {
                 boolean ok = new AuthController().login(username.getText(), password.getText());
                 if (ok) {
-                    root.getScene().setRoot(new MainView(username.getText()).getRoot());
+                    UserDao ud = new UserDao();
+                    long userId = ud.getUserIdByUsername(username.getText());
+                    if (userId <= 0) {
+                        message.setText("Unable to resolve user id");
+                        message.setVisible(true);
+                        return;
+                    }
+                    root.getScene().setRoot(new MainView(userId).getRoot());
                 } else {
                     message.setText("Invalid credentials");
                     message.setVisible(true);
@@ -113,6 +121,7 @@ public class LoginView {
             regBox.setVisible(isRegister[0]);
             primaryBtn.setText(isRegister[0] ? "Register" : "Login");
             switchMode.setText(isRegister[0] ? "Back to login" : "Create account");
+            subtitle.setText(isRegister[0] ? "Create an account" : "Login to continue");
             message.setVisible(false);
         });
 

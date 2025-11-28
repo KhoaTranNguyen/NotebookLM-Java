@@ -13,6 +13,7 @@ public class MainApp extends Application {
         Scene scene = new Scene(new LoginView().getRoot(), 480, 640);
         scene.getStylesheets().add(getClass().getResource("/styles/carbon.css").toExternalForm());
         stage.setScene(scene);
+        stage.setMaximized(true);
         stage.show();
     }
 

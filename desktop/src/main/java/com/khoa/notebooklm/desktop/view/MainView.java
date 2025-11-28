@@ -31,7 +31,7 @@ public class MainView {
     private Label cardContentLabel;
     private Label cardCounterLabel;
 
-    public MainView(String username) {
+    public MainView(long userId) {
         // Top bar
         HBox top = new HBox();
         top.getStyleClass().addAll("cds-section");
@@ -43,12 +43,15 @@ public class MainView {
         // Sidebar
         VBox sideBox = new VBox(24); // Increased spacing between sections
         sideBox.setMinWidth(300); // Wider sidebar for contained lists
-        sideBox.getStyleClass().add("cds-section");
-        sideBox.setPadding(new Insets(16));
+        sideBox.setPrefWidth(300);
+        sideBox.setMaxWidth(300);
+        // sideBox.getStyleClass().add("cds-section"); // Removed to avoid extra spacing issues
+        // sideBox.setPadding(new Insets(16)); // Removed padding to align with tabs
 
         // 1. Document List (Contained List Pattern)
         VBox docContainer = new VBox();
         docContainer.getStyleClass().add("contained-list");
+        VBox.setVgrow(docContainer, Priority.ALWAYS); // Grow to fill height
         
         HBox docHeader = new HBox();
         docHeader.getStyleClass().add("contained-list-header");
@@ -65,15 +68,15 @@ public class MainView {
         docHeader.getChildren().addAll(docTitle, docSpacer, uploadBtn);
 
         ListView<DocumentDao.DocumentRow> docList = new ListView<>();
-        docList.getItems().addAll(docDao.listDocuments());
+        docList.getItems().addAll(docDao.listDocumentsByUserId(userId));
         docList.setCellFactory(list -> new ListCell<>() {
             private final Button deleteBtn = new Button();
             private final Label label = new Label();
             private final HBox pane = new HBox(10, label, deleteBtn);
 
             {
-                FontIcon deleteIcon = new FontIcon("fas-trash");
-                deleteIcon.setIconColor(javafx.scene.paint.Color.RED);
+                FontIcon deleteIcon = new FontIcon("fas-times");
+                deleteIcon.setIconColor(javafx.scene.paint.Color.BLACK);
                 deleteBtn.setGraphic(deleteIcon);
                 deleteBtn.setStyle("-fx-background-color: transparent; -fx-cursor: hand;");
                 deleteBtn.setOnAction(event -> {
@@ -105,7 +108,7 @@ public class MainView {
                 }
             }
         });
-        
+        VBox.setVgrow(docList, Priority.ALWAYS);
         docContainer.getChildren().addAll(docHeader, docList);
 
         final long[] selectedDocId = { -1 };
@@ -120,9 +123,20 @@ public class MainView {
             File file = fileChooser.showOpenDialog(root.getScene().getWindow());
             if (file != null) {
                 try {
-                    ragController.ingestDocument(1, file); 
+                    int newDocId = ragController.ingestDocument(userId, file);
                     docList.getItems().clear();
-                    docList.getItems().addAll(docDao.listDocuments());
+                    docList.getItems().addAll(docDao.listDocumentsByUserId(userId));
+
+                    // Auto-select the newly uploaded document if present
+                    for (int i = 0; i < docList.getItems().size(); i++) {
+                        DocumentDao.DocumentRow row = docList.getItems().get(i);
+                        if (row.id() == newDocId) {
+                            docList.getSelectionModel().select(i);
+                            docList.scrollTo(i);
+                            selectedDocId[0] = newDocId;
+                            break;
+                        }
+                    }
                 } catch (Exception ex) {
                     ex.printStackTrace();
                 }
@@ -132,6 +146,7 @@ public class MainView {
         // 2. Saved Flashcards List (Contained List Pattern)
         VBox fcSetContainer = new VBox();
         fcSetContainer.getStyleClass().add("contained-list");
+        VBox.setVgrow(fcSetContainer, Priority.ALWAYS); // Grow to fill height
 
         HBox fcHeader = new HBox();
         fcHeader.getStyleClass().add("contained-list-header");
@@ -141,16 +156,16 @@ public class MainView {
         fcHeader.getChildren().add(fcTitleLabel);
 
         ListView<FlashcardDao.FlashcardSetInfo> fcSetList = new ListView<>();
-        // Load initial sets (assuming userId 1)
-        fcSetList.getItems().addAll(flashcardDao.getFlashcardSetsByUserId(1));
+        // Load initial sets for this user
+        fcSetList.getItems().addAll(flashcardDao.getFlashcardSetsByUserId(userId));
         
         fcSetList.setCellFactory(list -> new ListCell<>() {
             private final Button deleteBtn = new Button();
             private final Label label = new Label();
             private final HBox pane = new HBox(10, label, deleteBtn);
             {
-                FontIcon deleteIcon = new FontIcon("fas-trash");
-                deleteIcon.setIconColor(javafx.scene.paint.Color.RED);
+                FontIcon deleteIcon = new FontIcon("fas-times");
+                deleteIcon.setIconColor(javafx.scene.paint.Color.BLACK);
                 deleteBtn.setGraphic(deleteIcon);
                 deleteBtn.setStyle("-fx-background-color: transparent; -fx-cursor: hand;");
                 deleteBtn.setOnAction(event -> {
@@ -177,7 +192,7 @@ public class MainView {
                 }
             }
         });
-
+        VBox.setVgrow(fcSetList, Priority.ALWAYS);
         fcSetContainer.getChildren().addAll(fcHeader, fcSetList);
 
         sideBox.getChildren().addAll(docContainer, fcSetContainer);
@@ -217,10 +232,10 @@ public class MainView {
         VBox generatorView = new VBox(20);
         generatorView.setAlignment(Pos.CENTER);
         
-        Label fcTitle = new Label("Generate Flashcards");
+        Label fcTitle = new Label("Get flashcards based on your documents for better memorization!");
         fcTitle.setStyle("-fx-font-size: 20px;");
         
-        Button genBtn = new Button("Generate 5 Flashcards");
+        Button genBtn = new Button("Generate flashcards");
         // genBtn is Primary by default
         
         Label errorLabel = new Label();
@@ -335,9 +350,9 @@ public class MainView {
             
             result.ifPresent(topic -> {
                 try {
-                    flashcardDao.saveFlashcardSet(1, topic, currentFlashcardSet); // userId=1
+                    flashcardDao.saveFlashcardSet(userId, topic, currentFlashcardSet);
                     fcSetList.getItems().clear();
-                    fcSetList.getItems().addAll(flashcardDao.getFlashcardSetsByUserId(1));
+                    fcSetList.getItems().addAll(flashcardDao.getFlashcardSetsByUserId(userId));
                     
                     // Hide save button after saving
                     saveCurrentSetBtn.setVisible(false);
@@ -403,15 +418,23 @@ public class MainView {
         });
 
         // Footer
-        HBox footer = new HBox();
-        footer.setPadding(new Insets(8, 12, 8, 12));
+        VBox footer = new VBox();
+        footer.setPadding(new Insets(32, 16, 16, 16)); // Top 32px margin from content above
         Button logout = new Button("Logout");
+        logout.getStyleClass().add("secondary");
+        logout.setPrefWidth(300); // Match sidebar width
         logout.setOnAction(e -> root.getScene().setRoot(new LoginView().getRoot()));
         footer.getChildren().add(logout);
 
         root.setTop(top);
-        root.setLeft(sideBox);
-        root.setCenter(tabs);
+        
+        // Main Body Container (Sidebar + Tabs)
+        HBox mainBody = new HBox(32); // 32px gap between sidebar and tabs
+        mainBody.setPadding(new Insets(16)); // 16px padding around the whole body
+        mainBody.getChildren().addAll(sideBox, tabs);
+        HBox.setHgrow(tabs, Priority.ALWAYS);
+        
+        root.setCenter(mainBody);
         root.setBottom(footer);
     }
 

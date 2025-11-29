@@ -22,7 +22,7 @@ public class LoginView {
         root.getStyleClass().addAll("cds-container", "cds-section");
         root.setAlignment(Pos.CENTER);
 
-        Label title = new Label("NotebookLM Desktop");
+        Label title = new Label("KnockbookLM");
         title.getStyleClass().add("cds-title");
 
         Label subtitle = new Label("Login to continue");

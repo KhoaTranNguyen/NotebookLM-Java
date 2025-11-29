@@ -36,7 +36,7 @@ public class MainView {
         HBox top = new HBox();
         top.getStyleClass().addAll("cds-section");
         top.setPadding(new Insets(8, 16, 8, 16));
-        Label title = new Label("NotebookLM Desktop");
+        Label title = new Label("KnockbookLM");
         title.getStyleClass().add("cds-title");
         top.getChildren().addAll(title);
 

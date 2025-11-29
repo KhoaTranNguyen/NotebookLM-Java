@@ -9,7 +9,7 @@ public class MainApp extends Application {
 
     @Override
     public void start(Stage stage) {
-        stage.setTitle("NotebookLM Desktop");
+        stage.setTitle("KnockbookLM");
         Scene scene = new Scene(new LoginView().getRoot(), 480, 640);
         scene.getStylesheets().add(getClass().getResource("/styles/carbon.css").toExternalForm());
         stage.setScene(scene);

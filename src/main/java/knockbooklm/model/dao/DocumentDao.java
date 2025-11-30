@@ -90,14 +90,7 @@ public class DocumentDao {
         }
     }
 
-    public void deleteChunksByDocId(long docId) throws SQLException {
-        String sql = "DELETE FROM document_chunks WHERE document_id = ?";
-        try (Connection conn = Database.get().getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
-            stmt.setLong(1, docId);
-            stmt.executeUpdate();
-        }
-    }
+
 
     public record DocumentRow(long id, String filename) {}
 }

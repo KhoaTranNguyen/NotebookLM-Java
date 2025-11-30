@@ -8,6 +8,7 @@ import dev.langchain4j.store.embedding.EmbeddingMatch;
 import dev.langchain4j.store.embedding.EmbeddingSearchRequest;
 import dev.langchain4j.store.embedding.EmbeddingSearchResult;
 import dev.langchain4j.store.embedding.filter.comparison.IsEqualTo;
+
 import knockbooklm.model.dao.ChunkDao;
 import knockbooklm.model.MySqlEmbeddingStore;
 import knockbooklm.controller.base_class.Document;
@@ -30,6 +31,7 @@ public class RAGController {
     private final VertexAiEmbeddingModel embeddingModel;
     private final MySqlEmbeddingStore embeddingStore;
     private final DocumentDao documentDao;
+    private final ChunkDao chunkDao;
 
     /**
      * Use Google Cloud Project ID and Location.
@@ -37,7 +39,7 @@ public class RAGController {
      */
     public RAGController() {
         // Hardcoded for now based on backend config, or could be env vars
-        this("gemini-langchain4j-codelab", "us-central1");
+        this("geminijava-478112", "us-central1");
     }
 
     public RAGController(String projectId, String location) {
@@ -56,7 +58,8 @@ public class RAGController {
                 .modelName("text-embedding-004")
                 .build();
 
-        this.embeddingStore = new MySqlEmbeddingStore(new ChunkDao());
+        this.chunkDao = new ChunkDao();
+        this.embeddingStore = new MySqlEmbeddingStore(this.chunkDao);
         this.documentDao = new DocumentDao();
     }
 
@@ -109,7 +112,7 @@ public class RAGController {
 
     public void deleteDocument(long docId) {
         try {
-            documentDao.deleteChunksByDocId(docId);
+            chunkDao.deleteChunksByDocId(docId);
             documentDao.deleteDocument(docId);
         } catch (Exception e) {
             e.printStackTrace();
@@ -133,8 +136,7 @@ public class RAGController {
     }
 
     public GeneratedFlashcardSet generateFlashcardSet(long documentId, int count) {
-        ChunkDao dao = new ChunkDao();
-        String context = dao.aggregateTextByDocument(documentId, 12000);
+        String context = chunkDao.aggregateTextByDocument(documentId, 12000);
         
         // 1. Generate Flashcards
         String[] lines = generateFlashcards(context, count);
@@ -154,8 +156,7 @@ public class RAGController {
     }
 
     public String[] generateFlashcardsFromDocument(long documentId, int count) {
-        ChunkDao dao = new ChunkDao();
-        String context = dao.aggregateTextByDocument(documentId, 12000);
+        String context = chunkDao.aggregateTextByDocument(documentId, 12000);
         return generateFlashcards(context, count);
     }
 
@@ -182,8 +183,7 @@ public class RAGController {
         String context;
         if (searchResult.matches().isEmpty()) {
             // Fallback to simple aggregation if no vectors found or no match
-            ChunkDao dao = new ChunkDao();
-            context = dao.aggregateTextByDocument(documentId, 12000);
+            context = chunkDao.aggregateTextByDocument(documentId, 12000);
         } else {
             context = searchResult.matches().stream()
                     .map(match -> match.embedded().text())

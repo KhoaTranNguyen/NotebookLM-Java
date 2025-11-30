@@ -18,7 +18,7 @@ public class FlashcardDao {
     }
 
     private void createTableIfNotExists() {
-        String sql = "CREATE TABLE IF NOT EXISTS flashcard_sets (" +
+        String sql = "CREATE TABLE IF NOT EXISTS flashcards (" +
                      "set_id INT AUTO_INCREMENT PRIMARY KEY, " +
                      "user_id BIGINT, " +
                      "topic_name VARCHAR(255), " +
@@ -34,7 +34,7 @@ public class FlashcardDao {
     }
 
     public void saveFlashcardSet(long userId, String topic, List<Flashcard> cards) {
-        String sql = "INSERT INTO flashcard_sets (user_id, topic_name, flashcards_json) VALUES (?, ?, ?)";
+        String sql = "INSERT INTO flashcards (user_id, topic_name, flashcards_json) VALUES (?, ?, ?)";
         try (Connection c = Database.get().getConnection();
              PreparedStatement ps = c.prepareStatement(sql)) {
             ps.setLong(1, userId);
@@ -48,7 +48,7 @@ public class FlashcardDao {
 
     public List<FlashcardSetInfo> getFlashcardSetsByUserId(long userId) {
         List<FlashcardSetInfo> sets = new ArrayList<>();
-        String sql = "SELECT set_id, topic_name, created_at FROM flashcard_sets WHERE user_id = ? ORDER BY created_at DESC";
+        String sql = "SELECT set_id, topic_name, created_at FROM flashcards WHERE user_id = ? ORDER BY created_at DESC";
         try (Connection c = Database.get().getConnection();
              PreparedStatement ps = c.prepareStatement(sql)) {
             ps.setLong(1, userId);
@@ -68,7 +68,7 @@ public class FlashcardDao {
     }
 
     public List<Flashcard> getFlashcardsBySetId(int setId) {
-        String sql = "SELECT flashcards_json FROM flashcard_sets WHERE set_id = ?";
+        String sql = "SELECT flashcards_json FROM flashcards WHERE set_id = ?";
         try (Connection c = Database.get().getConnection();
              PreparedStatement ps = c.prepareStatement(sql)) {
             ps.setInt(1, setId);
@@ -86,7 +86,7 @@ public class FlashcardDao {
     }
 
     public void deleteFlashcardSet(int setId) {
-        String sql = "DELETE FROM flashcard_sets WHERE set_id = ?";
+        String sql = "DELETE FROM flashcards WHERE set_id = ?";
         try (Connection c = Database.get().getConnection();
              PreparedStatement ps = c.prepareStatement(sql)) {
             ps.setInt(1, setId);

@@ -1,36 +1,58 @@
-# --- 1. GLOBAL & IDE (File rác hệ thống và cấu hình Editor) ---
+# --- 1. Build Tools & Output ---
+target/
+*.class
+*.jar
+*.war
+*.ear
+*.nar
+*.zip
+*.tar.gz
+*.rar
+
+# Maven
+dependency-reduced-pom.xml
+release.properties
+
+# --- 2. IDE & Editor Configuration ---
+# IntelliJ IDEA
+.idea/
+*.iml
+*.iws
+*.ipr
+out/
+
+# Eclipse
+.classpath
+.project
+.settings/
+bin/
+
+# Visual Studio Code
+.vscode/
+*.code-workspace
+
+# NetBeans
+nbproject/private/
+build/
+nbbuild/
+dist/
+nbdist/
+.nb-gradle/
+
+# --- 3. OS & System Files ---
 .DS_Store
 Thumbs.db
-.idea/
-.vscode/
-*.iml
+ehthumbs.db
+Desktop.ini
+
+# --- 4. Logs & Temporary Files ---
 *.log
+*.tmp
+*.bak
+*.swp
+hs_err_pid*
 
-# --- 2. BACKEND (Java Spring Boot) ---
-# Thư mục chứa file biên dịch (class, jar) - Không up lên
-backend/target/
-backend/*.jar
-
-# Thư mục chứa dữ liệu chạy thực tế (Vector Store & File Text) - Không up lên
-# backend/data/
-
-# File cấu hình chứa Key nhạy cảm (Nếu bạn muốn bảo mật tuyệt đối thì bỏ comment dòng dưới)
-# backend/src/main/resources/application.properties
-
-# --- 3. FRONTEND (React Vite) ---
-# Thư viện tải về (Rất nặng, không up lên)
-frontend/node_modules/
-
-# Thư mục build ra web tĩnh
-frontend/dist/
-frontend/build/
-
-# File biến môi trường (Chứa API Key)
-frontend/.env
-frontend/.env.local
-frontend/.env.*.local
-
-# Log lỗi của npm
-frontend/npm-debug.log*
-frontend/yarn-debug.log*
-frontend/yarn-error.log*
+# --- 5. Application Specific ---
+# Ignored specific data/config if needed in future
+# src/main/resources/application.properties
+# *.env
